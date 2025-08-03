@@ -1,7 +1,5 @@
 const express = require("express");
-const app = express();
-const bodyParser = require("body-parser");
-const axios = require("axios");
+const wpController = require("../../controller/wp-controller.js");
 const {
   handleAddInventory,
   handleAddSale,
@@ -9,27 +7,24 @@ const {
   handleSummary,
   handleGenerateBill,
   handleCustomerOrder,
-} = require("./salesLogic");
+} = require("./salesLogic.js");
+const router = express.Router();
 
-app.use(bodyParser.json());
+router.route("/").get(wpController.getHelloWorld);
 
-app.get("/", (req, res) => {
-  res.send("Hello World!");
-});
-
-app.get("/webhooks", (req, res) => {
-  if (req.query["hub.mode"] == "subscribe") {
-    res.send(req.query["hub.challenge"]);
+router.get("/webhooks", (_req, _res) => {
+  if (_req.query["hub.mode"] == "subscribe") {
+    _res.send(_req.query["hub.challenge"]);
   } else {
-    res.sendStatus(400);
+    _res.sendStatus(400);
   }
 });
 
-app.get("/webhook", (req, res) => {
+router.get("/webhook", (_req, _res) => {
   const VERIFY_TOKEN = "mehta2155";
-  const mode = req.query["hub.mode"];
-  const token = req.query["hub.verify_token"];
-  const challenge = req.query["hub.challenge"];
+  const mode = _req.query["hub.mode"];
+  const token = _req.query["hub.verify_token"];
+  const challenge = _req.query["hub.challenge"];
 
   console.log(
     mode,
@@ -42,9 +37,9 @@ app.get("/webhook", (req, res) => {
 
   if (mode && token && mode === "subscribe" && token === VERIFY_TOKEN) {
     console.log("Webhook Verified");
-    res.status(200).send(challenge);
+    _res.status(200).send(challenge);
   } else {
-    res.sendStatus(403);
+    _res.sendStatus(403);
   }
 });
 
@@ -69,8 +64,8 @@ function sendMessage(to, message) {
         },
       }
     )
-    .then((res) => {
-      console.log(res, "Message sent!");
+    .then((_res) => {
+      console.log(_res, "Message sent!");
     })
     .catch((err) => {
       console.error(
@@ -104,9 +99,9 @@ function handleMessage(text) {
   return "🤖 Sorry, I did not understand that.";
 }
 
-app.post("/webhook", (req, res) => {
-  const body = req.body;
-  let body_param = req.body;
+router.post("/webhook", ( _req, _res) => {
+  const body = _req.body;
+//   let body_param = _req.body;
 
   if (
     body.object &&
@@ -131,9 +126,8 @@ app.post("/webhook", (req, res) => {
     sendMessage(from, response);
   }
 
-  res.sendStatus(200);
+  _res.sendStatus(200);
 });
 
-app.listen(3000, () => {
-  console.log("Server started on port 3000");
-});
+
+module.exports = router;
