@@ -14,8 +14,6 @@ const { registerJob } = require("./job-registeration.service");
 const { registerWorkers } = require("./dynamic-worker");
 const app = express();
 const bodyParser = require("body-parser");
-const xss = require("./middleware/xss");
-const axios = require("axios");
 
 app.use(bodyParser.json());
 
@@ -31,9 +29,6 @@ app.use(express.json());
 
 // parse urlencoded request body
 app.use(express.urlencoded({ extended: true }));
-
-// sanitize request data
-app.use(xss());
 
 // enable cors
 app.use(cors());

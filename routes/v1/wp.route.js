@@ -1,5 +1,6 @@
 const express = require("express");
 const wpController = require("../../controller/wp-controller.js");
+const axios = require("axios");
 const {
   handleAddInventory,
   handleAddSale,
@@ -8,6 +9,7 @@ const {
   handleGenerateBill,
   handleCustomerOrder,
 } = require("./salesLogic.js");
+
 const router = express.Router();
 
 router.route("/").get(wpController.getHelloWorld);
