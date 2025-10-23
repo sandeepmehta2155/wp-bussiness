@@ -112,7 +112,7 @@ async function chatWithRules(message, projectId) {
     
     **DETECTED MODULE**: ${detectedModule}
     
-    **MISSION**: Generate COMPLETE WORKING NestJS CRUD for ${detectedModule}
+    **MISSION**: Generate COMPLETE WORKING NodeJS CRUD for ${detectedModule}
     
     **MANDATORY DELIVERABLES** (ALL 5 FILES):
     
@@ -154,6 +154,7 @@ async function chatWithRules(message, projectId) {
     const response = await callOllama(fullPrompt);
     console.timeEnd('🤖 LLM');
     console.log("🤖 LLM response:", response);
+
     return {
       success: true,
       message: response,
