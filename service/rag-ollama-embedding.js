@@ -3,34 +3,50 @@ const { Pool } = require("pg");
 const { RecursiveCharacterTextSplitter } = require("@langchain/textsplitters");
 const axios = require('axios');
 
-// 🔥 100% OLLAMA - NO HF DEPENDENCY
-async function ollamaEmbeddings(texts) {
-  const response = await axios.post('http://localhost:11434/api/embeddings', {
-    model: "nomic-embed-text",  // Best for RAG (384 dims)
-    prompt: texts,
-    options: { truncate: true }
-  }, { timeout: 30000 });
-  
-  return response.data.embeddings;
-}
-
-async function embedQuery(query) {
+// 🔥 FIXED: Sequential Ollama Embeddings (1 prompt at a time)
+async function ollamaEmbedSingle(text) {
   const response = await axios.post('http://localhost:11434/api/embeddings', {
     model: "nomic-embed-text",
-    prompt: query,
+    prompt: text,  // ✅ SINGLE STRING ONLY
     options: { truncate: true }
-  }, { timeout: 30000 });
+  }, { timeout: 10000 });
   
   return response.data.embedding;
+}
+
+// 🔥 FIXED: Process batch sequentially with concurrency limit
+async function ollamaEmbeddings(texts) {
+  const embeddings = [];
+  
+  // Process 3 at a time for speed
+  const concurrency = 3;
+  const chunks = [];
+  
+  for (let i = 0; i < texts.length; i += concurrency) {
+    chunks.push(texts.slice(i, i + concurrency));
+  }
+  
+  for (const chunk of chunks) {
+    const promises = chunk.map(text => ollamaEmbedSingle(text));
+    const chunkEmbeddings = await Promise.all(promises);
+    embeddings.push(...chunkEmbeddings);
+  }
+  
+  return embeddings;
+}
+
+// 🔥 FIXED: Single query embedding
+async function embedQuery(query) {
+  return await ollamaEmbedSingle(query);
 }
 
 // Global instances
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
-// 🔥 LOCAL OLLAMA LLM
+// 🔥 OLLAMA LLM (unchanged)
 async function callOllama(prompt) {
   const response = await axios.post('http://localhost:11434/api/generate', {
-    model: "qwen2.5-coder:7b",  // Your new best model
+    model: "qwen2.5-coder:7b",  // Or "mistral"
     prompt: prompt,
     stream: false,
     options: { temperature: 0.1, num_predict: 2000 }
@@ -38,7 +54,7 @@ async function callOllama(prompt) {
   return response.data.response || "No response generated";
 }
 
-// 🔥 FIXED VECTOR FORMATTER (384 dims for nomic-embed)
+// 🔥 VECTOR FORMATTER (384 dims)
 function fixEmbeddingForPgvector(embedding) {
   if (Array.isArray(embedding)) {
     return `[${embedding.join(',')}]`;
@@ -46,12 +62,12 @@ function fixEmbeddingForPgvector(embedding) {
   throw new Error(`Invalid embedding format: ${typeof embedding}`);
 }
 
-// 🧠 RETRIEVAL FUNCTION - LOCAL EMBEDDINGS
+// 🧠 RETRIEVAL (unchanged)
 async function retrieveRules(query, projectId, maxResults = 5) {
   try {
     console.time('🔍 Embedding');
     const queryEmbedding = fixEmbeddingForPgvector(await embedQuery(query));
-    console.timeEnd('🔍 Embedding'); // <100ms!
+    console.timeEnd('🔍 Embedding');
     
     console.log(`🔍 Query embedding fixed: ${queryEmbedding.slice(0, 50)}...`);
     
@@ -78,7 +94,7 @@ async function retrieveRules(query, projectId, maxResults = 5) {
   }
 }
 
-// 🔥 MAIN CHAT FUNCTION
+// 🔥 MAIN CHAT (unchanged)
 async function chatWithRules(message, projectId) {
   try {
     const context = await retrieveRules(message, projectId);
@@ -117,12 +133,12 @@ Respond EXACTLY:
     console.time('🤖 LLM');
     const response = await callOllama(fullPrompt);
     console.timeEnd('🤖 LLM');
-    
+    console.log("🤖 LLM response:", response);
     return {
       success: true,
       message: response,
       contextLength: context.length,
-      toolsUsed: 2, // Embeddings + LLM
+      toolsUsed: 2,
       model: "Qwen2.5-Coder (100% Local)",
     };
   } catch (error) {
@@ -134,7 +150,7 @@ Respond EXACTLY:
   }
 }
 
-// 🔥 RE-INGESTION WITH OLLAMA EMBEDDINGS (384 dims)
+// 🔥 FIXED INGESTION - Sequential embeddings
 async function ingestDocument(filePath, projectId) {
   try {
     const fileText = await fs.readFile(filePath, "utf8");
@@ -148,8 +164,8 @@ async function ingestDocument(filePath, projectId) {
 
     console.time('🔥 Embedding all chunks');
     const texts = docs.map(doc => doc.pageContent);
-    const embeddingsBatch = await ollamaEmbeddings(texts);
-    console.timeEnd('🔥 Embedding all chunks'); // 500ms vs 3s HF!
+    const embeddingsBatch = await ollamaEmbeddings(texts); // FIXED: Sequential
+    console.timeEnd('🔥 Embedding all chunks');
 
     const values = [];
     const placeholders = [];
@@ -164,15 +180,17 @@ async function ingestDocument(filePath, projectId) {
       paramIndex += 4;
     }
 
+    // Clear old docs
     await pool.query('DELETE FROM documents WHERE project_id = $1', [projectId]);
-    
+    console.log(`🗑️ Cleared old documents`);
+
     const client = await pool.connect();
     try {
       await client.query("BEGIN");
       const queryText = `INSERT INTO documents (project_id, file_name, content, embedding) VALUES ${placeholders.join(", ")}`;
       const result = await client.query(queryText, values);
       await client.query("COMMIT");
-      console.log(`✅ Ingested ${result.rowCount} documents (384 dims)`);
+      console.log(`✅ Ingested ${result.rowCount} documents (768 dims)`);
       return result.rowCount;
     } finally {
       client.release();

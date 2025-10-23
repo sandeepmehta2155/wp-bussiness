@@ -192,7 +192,6 @@ router.post('/chat-with-rules', async (req, res) => {
     
     const result = await chatWithRules(message, projectId);
     
-    
     res.json({
       success: true,
       message: result.response,

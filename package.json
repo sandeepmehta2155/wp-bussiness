@@ -5,7 +5,16 @@
   "type": "commonjs",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js"
+    "debug": "node --inspect app.js",
+    "dev": "node app.js",
+    "build": "prisma generate && prisma migrate deploy && prisma db push &&  knightlab-kb extract -p client",
+    "push": "prisma db push &&  knightlab-kb extract -p client",
+    "generate": "prisma generate",
+    "migrate": "prisma migrate deploy",
+    "pull": "prisma db pull",
+    "reset": "prisma migrate reset",
+    "seed": "prisma db seed",
+    "studio": "prisma studio"
   },
   "author": "",
   "license": "ISC",
