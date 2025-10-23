@@ -98,37 +98,57 @@ async function retrieveRules(query, projectId, maxResults = 5) {
 async function chatWithRules(message, projectId) {
   try {
     const context = await retrieveRules(message, projectId);
+
+    // 🔥 EXTRACT MODULE FROM QUESTION
+    const moduleMatch = message.match(/callout|resource|roster|destination|form|user/i);
+    const detectedModule = moduleMatch ? moduleMatch[0] : 'Resource';
     
-    const fullPrompt = `You are an expert software architect working on the **Stratik Backend** project.
+    const fullPrompt = `You are Stratik Backend AI Architect.
 
-**MANDATORY**: Answer using ONLY the business rules context below.
-
-**BUSINESS RULES**:
-${context}
-
-**QUESTION**: ${message}
-
-Respond EXACTLY:
-
-**BUSINESS RULES**
-[Direct quotes from context]
-
-**IMPLEMENTATION**
-1. Step 1
-2. Step 2
-
-**CODE**
-\`\`\`typescript
-// Complete NestJS implementation
-\`\`\`
-
-**EDGE CASES**
-• Case 1
-
-**TESTS**
-\`\`\`typescript
-// Jest tests
-\`\`\``;
+    **BUSINESS RULES**:
+    ${context}
+    
+    **USER REQUEST**: ${message}
+    
+    **DETECTED MODULE**: ${detectedModule}
+    
+    **MISSION**: Generate COMPLETE WORKING NestJS CRUD for ${detectedModule}
+    
+    **MANDATORY DELIVERABLES** (ALL 5 FILES):
+    
+    1. **CONTROLLER** - Full CRUD with RBAC permissions from business rules
+    2. **SERVICE** - Prisma implementation  
+    3. **DTOs** - Input validation
+    4. **TESTS** - Complete Jest coverage
+    5. **SUMMARY** - Business rules applied
+    
+    **EXACT FORMAT**:
+    **🎯 MODULE**: ${detectedModule}
+    
+    **📋 BUSINESS RULES APPLIED**
+    [Direct quotes]
+    
+    **1. CONTROLLER** (${detectedModule}Controller)
+    \`\`\`typescript
+    [COMPLETE FILE]
+    \`\`\`
+    
+    **2. SERVICE** (${detectedModule}Service)
+    \`\`\`typescript
+    [COMPLETE FILE]
+    \`\`\`
+    
+    **3. DTOS**
+    \`\`\`typescript
+    [COMPLETE FILE]
+    \`\`\`
+    
+    **4. TESTS**
+    \`\`\`typescript
+    [COMPLETE FILE]
+    \`\`\`
+    
+    **✅ READY TO COPY-PASTE**`;
 
     console.time('🤖 LLM');
     const response = await callOllama(fullPrompt);
@@ -137,6 +157,7 @@ Respond EXACTLY:
     return {
       success: true,
       message: response,
+      detectedModule,
       contextLength: context.length,
       toolsUsed: 2,
       model: "Qwen2.5-Coder (100% Local)",
