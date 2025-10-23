@@ -1,6 +1,6 @@
 const { myDynamicJobHandler } = require("./dynamic-job-handler.js");
-const { getPgBoss } = require("./pg-boss.js");
-const CONSTANT = require("./utils/constants.js");
+const { getPgBoss } = require("../pg-boss.js");
+const CONSTANT = require("../utils/constants.js");
 
 // Register a single worker to handle all dynamic jobs based on their name
 const registerWorkers = async () => {

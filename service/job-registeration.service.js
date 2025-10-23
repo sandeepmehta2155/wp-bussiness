@@ -1,5 +1,5 @@
-const { getPgBoss } = require("./pg-boss.js");
-const CONSTANT = require("./utils/constants.js");
+const { getPgBoss } = require("../pg-boss.js");
+const CONSTANT = require("../utils/constants.js");
 
 
 const registerJob = async () => {

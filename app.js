@@ -10,8 +10,8 @@ const ApiError = require("./utils/api-error.js");
 const errorConverter = require("./middleware/error-converter.js");
 const errorHandler = require("./middleware/error-handler.js");
 const { initializePgBoss } = require("./pg-boss");
-const { registerJob } = require("./job-registeration.service");
-const { registerWorkers } = require("./dynamic-worker");
+const { registerJob } = require("./service/job-registeration.service.js");
+const { registerWorkers } = require("./service/dynamic-worker.js");
 const app = express();
 const bodyParser = require("body-parser");
 

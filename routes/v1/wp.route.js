@@ -9,6 +9,19 @@ const {
   handleGenerateBill,
   handleCustomerOrder,
 } = require("./salesLogic.js");
+const { embeddings, ingestDocument } = require("../../service/emedding-docs.js");
+const { chatWithRules } = require("../../service/rag-emedding.js");
+const { pipeline } = require("@xenova/transformers");
+
+
+let embedder;
+
+// Load model once at startup
+(async () => {
+  console.log("⏳ Loading embedding model...");
+  embedder = await pipeline("feature-extraction", "Xenova/all-MiniLM-L6-v2");
+  console.log("✅ Model loaded: all-MiniLM-L6-v2");
+})();
 
 const router = express.Router();
 
@@ -130,6 +143,67 @@ router.post("/webhook", ( _req, _res) => {
 
   _res.sendStatus(200);
 });
+
+// Endpoint: generate embeddings
+router.post("/embed", async (req, res) => {
+  const { text } = req.body;
+  if (!text) return res.status(400).json({ error: "Missing text" });
+
+  const output = await embedder(text);
+  const embedding = Array.from(output[0][0]); // flatten
+  res.status(200).send({ embedding });
+
+});
+
+router.post("/embed-search", async (req, res) => {
+  const { query, topK = 5 } = req.body;
+
+  const [queryEmbedding] = await embeddings.embedDocuments([query]);
+  const { rows } = await pool.query(
+    `SELECT id, content, metadata, embedding <=> $1 AS distance
+     FROM documents
+     ORDER BY embedding <=> $1
+     LIMIT $2`,
+    [queryEmbedding, topK]
+  );
+
+  res.json(rows);
+});
+
+router.post("/ingest-document", async (req, res) => {
+ try { 
+    const { projectId } = req.body;
+
+    if (!projectId) {
+      return res.status(400).send({ message: "Project ID is required" });
+    }
+
+    await ingestDocument("./docs/business-rules.mdc", projectId);
+    res.status(200).send({ message: "Document ingested successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: "Error ingesting document", error: error.message });
+  }
+});
+
+router.post('/chat-with-rules', async (req, res) => {
+  try {
+    const { message, projectId } = req.body;
+    
+    const result = await chatWithRules(message, projectId);
+    
+    
+    res.json({
+      success: true,
+      message: result.response,
+      context: result.usedTools,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 
 
 module.exports = router;

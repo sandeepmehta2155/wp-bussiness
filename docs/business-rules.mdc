@@ -1,0 +1,225 @@
+---
+title: Business Rules & Module Documentation
+description: Reference guide for business rules across all modules and user roles
+---
+
+# Business Rules Documentation
+
+## Overview
+
+Comprehensive business rules for the Stratik Backend application are documented in `/docs/business-rules/`. This documentation is organized by module and user role to facilitate efficient code generation and implementation.
+
+## Six Core Modules
+
+1. **Resource Module** (`docs/business-rules/resource/`)
+   - Resource creation, management, and lifecycle
+   - Event-specific resources
+   - Category-based resource organization
+   - Team Lead/Secondary Team Lead resource management
+
+2. **Callout Module** (`docs/business-rules/callout/`)
+   - Callout creation and management
+   - Response tracking
+   - Notification handling (SMS, Email, Push)
+   - Team-based callout scoping
+
+3. **Destination Matrix Module** (`docs/business-rules/destination-matrix/`)
+   - ETA calculations from departing locations to destination
+   - Available resources display sorted by ETA
+   - Utility dashboard sharing via secure tokens
+   - Map visualization with routes and regions
+   - Export reports (CSV, Excel, PDF)
+
+4. **Roster Module** (`docs/business-rules/roster/`)
+   - Roster creation and scheduling
+   - Resource assignment to rosters
+   - Running availability management
+   - Roster import/export
+   - Roster versioning and history
+
+5. **Form Generator Module** (`docs/business-rules/form-generator/`)
+   - Dynamic form template creation
+   - Form field configuration
+   - Form submission handling
+   - Conditional fields and validation
+   - Form workflows
+
+6. **User Access Management Module** (`docs/business-rules/user-access-management/`)
+   - User authentication and authorization
+   - Role-based access control (RBAC)
+   - Permission management (module-action based)
+   - Category-based user scoping
+   - Multi-tenant user management
+
+## Four User Role Types
+
+Each module's rules are documented separately for each role:
+
+### 1. Admin (`*/admin/rules.md`)
+- Full system access
+- Configuration and management capabilities
+- Cross-category access
+- System-wide operations
+
+### 2. Team Lead (`*/team-lead/rules.md`)
+- Category-scoped access
+- Team management capabilities
+- Can designate Secondary Team Lead
+- Resource and roster management within category
+
+### 3. Secondary Team Lead (`*/secondary-team-lead/rules.md`)
+- Delegated access from Team Lead
+- Category-scoped (same as Team Lead)
+- Limited write permissions
+- Primarily monitoring and viewing role
+
+### 4. Access-Based User (`*/access-based-user/rules.md`)
+- Module-action permission based access
+- Most restrictive role
+- Self-service profile management only
+- Requires explicit permission grants for each operation
+
+## How to Use This Documentation
+
+### For Code Generation
+When implementing new features or endpoints:
+
+1. **Identify the module** (Resource, Callout, Roster, Form Generator, User Access Management)
+2. **Identify the user role** (Admin, Team Lead, Secondary Team Lead, Access-Based User)
+3. **Reference** `docs/business-rules/{module}/{role}/rules.md`
+4. **Follow the documented rules** for:
+   - Access control & permissions
+   - Core business logic & constraints
+   - Key workflows & processes
+   - Data relationships & dependencies
+   - Validation rules
+   - Special cases & edge cases
+
+### For New Task Implementation
+
+#### Step 1: Consult Business Rules
+```
+Read: docs/business-rules/{relevant-module}/{relevant-role}/rules.md
+```
+
+#### Step 2: Apply Standard Patterns
+Follow the existing workspace rules:
+- Email handling: Use `cleanEmail()`
+- User deletion: Use `userService.deleteUser()` or `userService.removeUser()`
+- Multi-tenant: Get prisma via `tenant.get(subdomain)`
+- Permissions: Use `verifyAccess([{ module, action }])`
+- Controllers: Destructure requests, delegate to services
+- Services: Accept object params with `{ prisma, ... }`
+
+#### Step 3: Implement with Role Context
+Ensure the implementation respects:
+- What the user role CAN do
+- What the user role CANNOT do
+- Scope limitations (category-based, permission-based)
+- Required validations
+- Special edge cases
+
+### For Permission Checks
+
+Always use the module-action permission model:
+
+```typescript
+import { Modules, Actions } from "../types/enums";
+import { verifyAccess } from "../middlewares/validateAccess";
+
+router.post(
+  "/endpoint",
+  auth(),
+  verifyAccess([{ module: Modules.RESOURCE, action: Actions.CREATE }]),
+  controller.handler
+);
+```
+
+**Reference:** See `docs/business-rules/user-access-management/` for detailed permission rules per role.
+
+### For Category-Based Scoping
+
+Team Leads and Secondary Team Leads operate within category boundaries:
+
+- **Queries**: Auto-filter by assigned category
+- **Mutations**: Validate category ownership
+- **Access checks**: Use `validateCategoryAccess` middleware where applicable
+
+**Reference:** See module-specific Team Lead rules for category scoping details.
+
+## Documentation Structure
+
+```
+docs/business-rules/
+├── README.md                          # Overview and guidelines
+├── resource/
+│   ├── README.md                      # Resource module overview
+│   ├── admin/rules.md                 # Admin-specific rules
+│   ├── team-lead/rules.md             # Team Lead rules
+│   ├── secondary-team-lead/rules.md   # STL rules
+│   └── access-based-user/rules.md     # Access-based user rules
+├── callout/
+│   ├── README.md
+│   ├── admin/rules.md
+│   ├── team-lead/rules.md
+│   ├── secondary-team-lead/rules.md
+│   └── access-based-user/rules.md
+├── destination-matrix/
+│   ├── README.md
+│   ├── admin/rules.md
+│   ├── team-lead/rules.md
+│   ├── secondary-team-lead/rules.md
+│   └── access-based-user/rules.md
+├── roster/
+│   ├── README.md
+│   ├── admin/rules.md
+│   ├── team-lead/rules.md
+│   ├── secondary-team-lead/rules.md
+│   └── access-based-user/rules.md
+├── form-generator/
+│   ├── README.md
+│   ├── admin/rules.md
+│   ├── team-lead/rules.md
+│   ├── secondary-team-lead/rules.md
+│   └── access-based-user/rules.md
+└── user-access-management/
+    ├── README.md
+    ├── admin/rules.md
+    ├── team-lead/rules.md
+    ├── secondary-team-lead/rules.md
+    └── access-based-user/rules.md
+```
+
+## Quick Reference Matrix
+
+| Module | Admin Access | Team Lead Access | STL Access | Access-Based User |
+|--------|-------------|------------------|------------|-------------------|
+| Resource | Full CRUD, all categories | CRUD within category | View within category | Permission-based |
+| Callout | Full CRUD, all categories | CRUD within category | View within category | Permission-based |
+| Destination Matrix | View all, share to utilities | View team/category only | View team/category only | Permission-based |
+| Roster | Full CRUD, all categories | CRUD within category | View within category | Permission-based |
+| Form Generator | Full CRUD, all forms | CRUD within category | View within category | Submit & view own |
+| User Access Mgmt | Full user management | View team users | View team users | View/edit own profile |
+
+## Integration with Existing Rules
+
+This business rules documentation **complements** the existing workspace rules:
+
+- **Existing rules** define **how** to implement (technical patterns)
+- **Business rules** define **what** to implement (business logic and constraints)
+
+Both must be followed for correct implementation.
+
+## Maintenance
+
+- **When adding new features**: Update relevant module/role documentation
+- **When changing business logic**: Update rules before implementing
+- **During code reviews**: Verify implementation matches documented rules
+- **For onboarding**: Start with `docs/business-rules/README.md`
+
+## Notes
+
+- All rule files are templates ready to be filled with specific business logic
+- Rules should be kept up-to-date with actual implementation
+- Rules are version-controlled alongside code
+- Rules serve as single source of truth for business requirements
