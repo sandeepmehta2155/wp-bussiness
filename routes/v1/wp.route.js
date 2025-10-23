@@ -9,8 +9,8 @@ const {
   handleGenerateBill,
   handleCustomerOrder,
 } = require("./salesLogic.js");
-const { embeddings, ingestDocument } = require("../../service/emedding-docs.js");
-const { chatWithRules } = require("../../service/rag-emedding.js");
+const { embeddings } = require("../../service/emedding-docs.js");
+const { chatWithRules, ingestDocument } = require("../../service/rag-ollama-embedding.js");
 const { pipeline } = require("@xenova/transformers");
 
 
