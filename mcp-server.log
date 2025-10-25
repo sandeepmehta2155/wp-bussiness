@@ -1,0 +1,162 @@
+[2025-10-24T17:07:30.827Z] 🚀 [MCP] Tool Call Started: chat_with_rules
+[2025-10-24T17:07:30.827Z] 📝 [MCP] Tool Arguments: {
+  "message": "What are the core modules in Stratik and their current status?",
+  "projectId": "1"
+}
+[2025-10-24T17:07:30.827Z] ⏰ [MCP] Start Time: 2025-10-24T17:07:30.827Z
+[2025-10-24T17:07:30.827Z] 💬 [MCP] Chat with Rules - Message: "What are the core modules in Stratik and their current status?", Project: 1
+[2025-10-24T17:07:30.828Z] 🔄 [MCP] Starting RAG chat processing...
+[2025-10-24T17:07:38.749Z] ✅ [MCP] RAG chat processing completed. Success: true **🎯 MODULE**: Resource
+
+**📋 BUSINESS RULES APPLIED**
+The Resource Module (`docs/business-rules/resource/`) encompasses resource creation, management, and lifecycle. It includes event-specific resources, category-based organization, and team lead/secondary team lead management.
+
+**IMPLEMENTATION**
+1. **Resource Creation**: Admins can create new resources.
+2. **Management**: Team Leads and Secondary Team Leads manage resources within their categories.
+3. **Lifecycle**: Resources go through various stages from creation to lifecycle management.
+
+**EDGE CASES**
+• Ensure that only authorized users (Admins, Team Leads, Secondary Team Leads) can access and modify resources.
+• Implement category-based resource organization for better management and visibility.
+
+**✅ READY TO COPY-PASTE**
+[2025-10-24T17:07:38.749Z] 📤 [MCP] Chat with Rules Response (Success): {
+  "model": "Qwen2.5-Coder (100% Local)",
+  "contextLength": 2733,
+  "toolsUsed": 2,
+  "detectedModule": "Resource",
+  "messageLength": 790,
+  "message": "**🎯 MODULE**: Resource\n\n**📋 BUSINESS RULES APPLIED**\nThe Resource Module (`docs/business-rules/resource/`) encompasses resource creation, management, and lifecycle. It includes event-specific resources, category-based organization, and team lead/secondary team lead management.\n\n**IMPLEMENTATION**\n1. **Resource Creation**: Admins can create new resources.\n2. **Management**: Team Leads and Secondary Team Leads manage resources within their categories.\n3. **Lifecycle**: Resources go through various stages from creation to lifecycle management.\n\n**EDGE CASES**\n• Ensure that only authorized users (Admins, Team Leads, Secondary Team Leads) can access and modify resources.\n• Implement category-based resource organization for better management and visibility.\n\n**✅ READY TO COPY-PASTE**"
+}
+[2025-10-24T17:07:38.749Z] ⏰ [MCP] End Time: 2025-10-24T17:07:38.749Z
+[2025-10-24T17:07:38.749Z] 🏁 [MCP] Tool Call Completed: chat_with_rules (7922ms)
+[2025-10-24T17:07:38.750Z] ────────────────────────────────────────────────────────────────────────────────
+[2025-10-24T17:07:41.007Z] 🚀 [MCP] Tool Call Started: chat_with_rules
+[2025-10-24T17:07:41.007Z] 📝 [MCP] Tool Arguments: {
+  "message": "What are the six core modules in Stratik Backend system?",
+  "projectId": "1"
+}
+[2025-10-24T17:07:41.007Z] ⏰ [MCP] Start Time: 2025-10-24T17:07:41.007Z
+[2025-10-24T17:07:41.007Z] 💬 [MCP] Chat with Rules - Message: "What are the six core modules in Stratik Backend system?", Project: 1
+[2025-10-24T17:07:41.007Z] 🔄 [MCP] Starting RAG chat processing...
+[2025-10-24T17:07:47.811Z] 📤 [MCP] Chat with Rules Response (Success): {
+  "model": "Qwen2.5-Coder (100% Local)",
+  "contextLength": 2733,
+  "toolsUsed": 2,
+  "detectedModule": "Resource",
+  "messageLength": 744,
+  "message": "**🎯 MODULE**: Resource\n\n**📋 BUSINESS RULES APPLIED**\n1. Resource creation, management, and lifecycle\n2. Event-specific resources\n3. Category-based resource organization\n4. Team Lead/Secondary Team Lead resource management\n\n**IMPLEMENTATION**\n1. **Resource Creation**: Admins can create new resources across all categories.\n2. **Management**: Team Leads and Secondary Team Leads manage resources within their designated categories.\n3. **Lifecycle**: Resources go through various states (e.g., active, inactive) managed by the appropriate roles.\n\n**EDGE CASES**\n• Ensure that resource creation adheres to category-specific rules.\n• Verify that only authorized users can modify or delete resources outside their scope.\n\n**✅ READY TO COPY-PASTE**"
+}
+[2025-10-24T17:07:47.811Z] ✅ [MCP] RAG chat processing completed. Success: true **🎯 MODULE**: Resource
+
+**📋 BUSINESS RULES APPLIED**
+1. Resource creation, management, and lifecycle
+2. Event-specific resources
+3. Category-based resource organization
+4. Team Lead/Secondary Team Lead resource management
+
+**IMPLEMENTATION**
+1. **Resource Creation**: Admins can create new resources across all categories.
+2. **Management**: Team Leads and Secondary Team Leads manage resources within their designated categories.
+3. **Lifecycle**: Resources go through various states (e.g., active, inactive) managed by the appropriate roles.
+
+**EDGE CASES**
+• Ensure that resource creation adheres to category-specific rules.
+• Verify that only authorized users can modify or delete resources outside their scope.
+
+**✅ READY TO COPY-PASTE**
+[2025-10-24T17:07:47.811Z] ⏰ [MCP] End Time: 2025-10-24T17:07:47.811Z
+[2025-10-24T17:07:47.811Z] ────────────────────────────────────────────────────────────────────────────────
+[2025-10-24T17:07:47.811Z] 🏁 [MCP] Tool Call Completed: chat_with_rules (6804ms)
+[2025-10-24T17:08:38.613Z] 🚀 [MCP] Tool Call Started: chat_with_rules
+[2025-10-24T17:08:38.613Z] 📝 [MCP] Tool Arguments: {
+  "message": "What are the core modules in Stratik and their current status?",
+  "projectId": "1"
+}
+[2025-10-24T17:08:38.613Z] ⏰ [MCP] Start Time: 2025-10-24T17:08:38.613Z
+[2025-10-24T17:08:38.613Z] 🔄 [MCP] Starting RAG chat processing...
+[2025-10-24T17:08:38.613Z] 💬 [MCP] Chat with Rules - Message: "What are the core modules in Stratik and their current status?", Project: 1
+[2025-10-24T17:08:45.387Z] ✅ [MCP] RAG chat processing completed. Success: true **🎯 MODULE**: Resource
+
+**📋 BUSINESS RULES APPLIED**
+1. Resource creation, management, and lifecycle
+2. Event-specific resources
+3. Category-based resource organization
+4. Team Lead/Secondary Team Lead resource management
+
+**IMPLEMENTATION**
+1. **Resource Creation**: Admins can create new resources across all categories.
+2. **Management**: Team Leads and Secondary Team Leads can manage resources within their designated categories.
+3. **Lifecycle**: All users with appropriate permissions can update, delete, or archive resources.
+
+**EDGE CASES**
+• Resource creation must adhere to category-specific rules.
+• Team Lead/Secondary Team Lead access is limited to their respective categories.
+
+**✅ READY TO COPY-PASTE**
+[2025-10-24T17:08:45.387Z] ⏰ [MCP] End Time: 2025-10-24T17:08:45.387Z
+[2025-10-24T17:08:45.387Z] 🏁 [MCP] Tool Call Completed: chat_with_rules (6774ms)
+[2025-10-24T17:08:45.387Z] 📤 [MCP] Chat with Rules Response (Success): {
+  "model": "Qwen2.5-Coder (100% Local)",
+  "contextLength": 2733,
+  "toolsUsed": 2,
+  "detectedModule": "Resource",
+  "messageLength": 720,
+  "message": "**🎯 MODULE**: Resource\n\n**📋 BUSINESS RULES APPLIED**\n1. Resource creation, management, and lifecycle\n2. Event-specific resources\n3. Category-based resource organization\n4. Team Lead/Secondary Team Lead resource management\n\n**IMPLEMENTATION**\n1. **Resource Creation**: Admins can create new resources across all categories.\n2. **Management**: Team Leads and Secondary Team Leads can manage resources within their designated categories.\n3. **Lifecycle**: All users with appropriate permissions can update, delete, or archive resources.\n\n**EDGE CASES**\n• Resource creation must adhere to category-specific rules.\n• Team Lead/Secondary Team Lead access is limited to their respective categories.\n\n**✅ READY TO COPY-PASTE**"
+}
+[2025-10-24T17:08:45.387Z] ────────────────────────────────────────────────────────────────────────────────
+[2025-10-25T04:37:17.492Z] 🚀 [MCP] Starting AI Embedding MCP Server...
+[2025-10-25T04:37:17.492Z] 🚀 [MCP] Starting AI Embedding MCP Server...
+[2025-10-25T04:37:17.496Z] ✅ [MCP] AI Embedding MCP Server running on stdio
+[2025-10-25T04:37:17.496Z] 📋 [MCP] Available tools: ingest_document, chat_with_rules
+[2025-10-25T04:37:17.496Z] ────────────────────────────────────────────────────────────────────────────────
+[2025-10-25T04:37:17.496Z] ✅ [MCP] AI Embedding MCP Server running on stdio
+[2025-10-25T04:37:17.496Z] ────────────────────────────────────────────────────────────────────────────────
+[2025-10-25T04:37:17.496Z] 📋 [MCP] Available tools: ingest_document, chat_with_rules
+[2025-10-25T04:37:17.660Z] 🔧 [MCP] ListToolsRequestSchema - Listing available tools
+[2025-10-25T04:37:17.661Z] 🔧 [MCP] ListToolsRequestSchema - Listing available tools
+[2025-10-25T04:37:17.661Z] 🔧 [MCP] ListToolsRequestSchema - Listing available tools
+[2025-10-25T04:37:17.662Z] 🔧 [MCP] ListToolsRequestSchema - Listing available tools
+[2025-10-25T04:37:17.662Z] 🔧 [MCP] ListToolsRequestSchema - Listing available tools
+[2025-10-25T04:37:39.144Z] 🚀 [MCP] Starting AI Embedding MCP Server...
+[2025-10-25T04:37:39.147Z] ✅ [MCP] AI Embedding MCP Server running on stdio
+[2025-10-25T04:37:39.147Z] 📋 [MCP] Available tools: ingest_document, chat_with_rules
+[2025-10-25T04:37:39.147Z] ────────────────────────────────────────────────────────────────────────────────
+[2025-10-25T04:43:40.337Z] 🚀 [MCP] Tool Call Started: chat_with_rules
+[2025-10-25T04:43:40.337Z] 📝 [MCP] Tool Arguments: {
+  "message": "How are resources used in callout module ?",
+  "projectId": "1"
+}
+[2025-10-25T04:43:40.337Z] ⏰ [MCP] Start Time: 2025-10-25T04:43:40.337Z
+[2025-10-25T04:43:40.337Z] 🔄 [MCP] Starting RAG chat processing...
+[2025-10-25T04:43:40.337Z] 💬 [MCP] Chat with Rules - Message: "How are resources used in callout module ?", Project: 1
+[2025-10-25T04:43:55.259Z] 🔍 [MCP] Raw result from chatWithRules: {
+  "success": true,
+  "message": "**🎯 MODULE**: resource\n\n**📋 BUSINESS RULES APPLIED**\n- Resource creation, management, and lifecycle (`docs/business-rules/resource/admin/rules.md`)\n- Event-specific resources (`docs/business-rules/resource/admin/rules.md`)\n- Category-based resource organization (`docs/business-rules/resource/admin/rules.md`)\n- Team Lead/Secondary Team Lead resource management (`docs/business-rules/resource/team-lead/rules.md`)\n\n**IMPLEMENTATION**\n1. **Resource Creation**: Admins and Team Leads can create resources by providing necessary details such as name, category, and event-specific attributes.\n2. **Management**: Resources are managed through a lifecycle that includes activation, deactivation, and updating of resource details.\n3. **Event-Specific Resources**: Admins can assign specific resources to events based on the requirements.\n4. **Category-Based Organization**: Resources are organized into categories for easier management and access.\n5. **Team Lead/Secondary Team Lead Management**: Team Leads and Secondary Team Leads manage resources within their teams, ensuring availability and proper assignment.\n\n**EDGE CASES**\n- **Resource Overlap**: Admins must ensure that resources are not assigned to multiple events simultaneously unless explicitly allowed.\n- **Resource Deactivation**: When a resource is deactivated, it should be immediately removed from any active assignments to prevent confusion and misuse.\n\n**✅ READY TO COPY-PASTE**",
+  "detectedModule": "resource",
+  "contextLength": 2827,
+  "toolsUsed": 2,
+  "model": "Qwen2.5-Coder (100% Local)"
+}
+[2025-10-25T04:43:55.259Z] 📤 [MCP] Chat with Rules Response (Success): {
+  "model": "Qwen2.5-Coder (100% Local)",
+  "contextLength": 2827,
+  "toolsUsed": 2,
+  "detectedModule": "resource",
+  "messageLength": 1443,
+  "message": "**🎯 MODULE**: resource\n\n**📋 BUSINESS RULES APPLIED**\n- Resource creation, management, and lifecycle (`docs/business-rules/resource/admin/rules.md`)\n- Event-specific resources (`docs/business-rules/resource/admin/rules.md`)\n- Category-based resource organization (`docs/business-rules/resource/admin/rules.md`)\n- Team Lead/Secondary Team Lead resource management (`docs/business-rules/resource/team-lead/rules.md`)\n\n**IMPLEMENTATION**\n1. **Resource Creation**: Admins and Team Leads can create resources by providing necessary details such as name, category, and event-specific attributes.\n2. **Management**: Resources are managed through a lifecycle that includes activation, deactivation, and updating of resource details.\n3. **Event-Specific Resources**: Admins can assign specific resources to events based on the requirements.\n4. **Category-Based Organization**: Resources are organized into categories for easier management and access.\n5. **Team Lead/Secondary Team Lead Management**: Team Leads and Secondary Team Leads manage resources within their teams, ensuring availability and proper assignment.\n\n**EDGE CASES**\n- **Resource Overlap**: Admins must ensure that resources are not assigned to multiple events simultaneously unless explicitly allowed.\n- **Resource Deactivation**: When a resource is deactivated, it should be immediately removed from any active assignments to prevent confusion and misuse.\n\n**✅ READY TO COPY-PASTE**",
+  "hasContext": false,
+  "allKeys": [
+    "success",
+    "message",
+    "detectedModule",
+    "contextLength",
+    "toolsUsed",
+    "model"
+  ]
+}
+[2025-10-25T04:43:55.259Z] ⏰ [MCP] End Time: 2025-10-25T04:43:55.259Z
+[2025-10-25T04:43:55.259Z] 🏁 [MCP] Tool Call Completed: chat_with_rules (14922ms)
+[2025-10-25T04:43:55.259Z] ✅ [MCP] RAG chat processing completed. Success: true
+[2025-10-25T04:43:55.259Z] ────────────────────────────────────────────────────────────────────────────────

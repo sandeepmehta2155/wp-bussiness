@@ -41,7 +41,7 @@ async function embedQuery(query) {
 }
 
 // Global instances
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const pool = new Pool({ connectionString: 'postgresql://postgres:postgres@localhost:5432/pgboss_wp' });
 
 // 🔥 OLLAMA LLM (unchanged)
 async function callOllama(prompt) {
@@ -105,48 +105,35 @@ async function chatWithRules(message, projectId) {
     
     const fullPrompt = `You are Stratik Backend AI Architect.
 
+    **MANDATORY**: You MUST use the business rules context below to answer. If the context doesn't contain the exact answer, say "The business rules documentation doesn't specify this detail."
+
     **BUSINESS RULES**:
     ${context}
     
-    **USER REQUEST**: ${message}
+    **QUESTION**: ${message}
     
-    **DETECTED MODULE**: ${detectedModule}
+    **CRITICAL INSTRUCTIONS**:
+    1. Answer using ONLY the business rules above
+    2. If question is about modules → Answer "6 core modules" from context
+    3. ALWAYS follow this exact format:
     
-    **MISSION**: Generate COMPLETE WORKING NodeJS CRUD for ${detectedModule}
+    **BUSINESS RULES**
+    [Direct quotes/extracts from context answering the question]
     
-    **MANDATORY DELIVERABLES** (ALL 5 FILES):
-    
-    1. **CONTROLLER** - Full CRUD with RBAC permissions from business rules
-    2. **SERVICE** - Prisma implementation  
-    3. **DTOs** - Input validation
-    4. **TESTS** - Complete Jest coverage
-    5. **SUMMARY** - Business rules applied
+    **IMPLEMENTATION**
+    [Steps based on business rules]
     
     **EXACT FORMAT**:
     **🎯 MODULE**: ${detectedModule}
     
     **📋 BUSINESS RULES APPLIED**
-    [Direct quotes]
+    [Direct quotes/extracts from context answering the question]
     
-    **1. CONTROLLER** (${detectedModule}Controller)
-    \`\`\`typescript
-    [COMPLETE FILE]
-    \`\`\`
+    **IMPLEMENTATION**
+    [Steps based on business rules]
     
-    **2. SERVICE** (${detectedModule}Service)
-    \`\`\`typescript
-    [COMPLETE FILE]
-    \`\`\`
-    
-    **3. DTOS**
-    \`\`\`typescript
-    [COMPLETE FILE]
-    \`\`\`
-    
-    **4. TESTS**
-    \`\`\`typescript
-    [COMPLETE FILE]
-    \`\`\`
+    **EDGE CASES**
+    • [From business rules]
     
     **✅ READY TO COPY-PASTE**`;
 
