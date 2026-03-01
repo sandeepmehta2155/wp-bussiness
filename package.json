@@ -15,7 +15,9 @@
     "pull": "prisma db pull",
     "reset": "prisma migrate reset",
     "seed": "prisma db seed",
-    "studio": "prisma studio"
+    "studio": "prisma studio",
+    "smartorder:migrate": "node scripts/run-smartorder-migration.js",
+    "smartorder:register-flows": "node scripts/register-flows.js"
   },
   "author": "",
   "license": "ISC",

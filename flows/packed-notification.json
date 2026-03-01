@@ -1,0 +1,62 @@
+{
+  "version": "3.0",
+  "data_api_version": "3.0",
+  "layout": {
+    "type": "single_column",
+    "children": [
+      {
+        "type": "text",
+        "text": "📦 Order Ready for Pickup",
+        "horizontal_alignment": "center",
+        "font_style": {
+          "bold": true,
+          "size": "large"
+        }
+      },
+      {
+        "type": "text",
+        "text": "Great news! Your order has been packed and is ready for pickup.",
+        "horizontal_alignment": "center"
+      },
+      {
+        "type": "form",
+        "children": [
+          {
+            "type": "text",
+            "text": "Thank you for your order!",
+            "horizontal_alignment": "center",
+            "font_style": {
+              "size": "large"
+            }
+          },
+          {
+            "type": "text",
+            "text": "You can pick up your order at:",
+            "horizontal_alignment": "center"
+          },
+          {
+            "type": "text",
+            "text": "{store_name}\n{store_address}",
+            "horizontal_alignment": "center",
+            "font_style": {
+              "bold": true
+            }
+          },
+          {
+            "type": "text",
+            "text": "Total Paid: ₹{total_amount}",
+            "horizontal_alignment": "center",
+            "font_style": {
+              "size": "medium"
+            }
+          }
+        ],
+        "submit_label": "Complete",
+        "submit_action": "order_complete"
+      }
+    ]
+  },
+  "submit": {
+    "action": "order_complete"
+  }
+}

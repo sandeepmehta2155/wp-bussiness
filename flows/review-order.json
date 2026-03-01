@@ -1,0 +1,60 @@
+{
+  "version": "3.0",
+  "data_api_version": "3.0",
+  "layout": {
+    "type": "single_column",
+    "children": [
+      {
+        "type": "text",
+        "text": "📝 Review Your Order",
+        "horizontal_alignment": "center",
+        "font_style": {
+          "bold": true,
+          "size": "large"
+        }
+      },
+      {
+        "type": "text",
+        "text": "We've parsed your order. Please review and make any corrections:",
+        "horizontal_alignment": "center"
+      },
+      {
+        "type": "form",
+        "children": [
+          {
+            "type": "repeater",
+            "key": "items",
+            "label": "Order Items",
+            "min_items": 1,
+            "children": [
+              {
+                "type": "text_input",
+                "key": "name",
+                "label": "Item Name",
+                "required": true
+              },
+              {
+                "type": "text_input",
+                "key": "quantity",
+                "label": "Quantity",
+                "placeholder": "e.g., 1kg, 2pcs, 500g",
+                "required": true
+              },
+              {
+                "type": "text_input",
+                "key": "notes",
+                "label": "Notes (optional)",
+                "placeholder": "Brand, quality, etc."
+              }
+            ]
+          }
+        ],
+        "submit_label": "Confirm Order",
+        "submit_action": "confirm_order"
+      }
+    ]
+  },
+  "submit": {
+    "action": "confirm_order"
+  }
+}

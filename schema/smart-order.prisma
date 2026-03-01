@@ -1,0 +1,109 @@
+// SmartOrder Schema
+// This file contains Prisma schema definitions for the SmartOrder module
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client-smartorder"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_PG_BOSS_URL")
+}
+
+// SmartOrder - Main order record
+model SmartOrder {
+  id              String     @id @default(uuid())
+  customerPhone   String
+  sellerPhone     String?
+  status          OrderStatus @default(PENDING)
+
+  // Order items - JSONB for flexible structure
+  items           Json
+  originalText    String?
+
+  // Pricing information
+  estimatedTotal  Float?
+  finalTotal      Float?
+
+  // Seller pricing
+  sellerItems     Json?  // Seller's pricing and availability
+
+  // Flow tracking
+  flowSessionId   String?
+
+  // Timestamps
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  // Status transitions
+  confirmedAt     DateTime?
+  packedAt        DateTime?
+  completedAt     DateTime?
+
+  // Messages sent
+  messages        SmartOrderMessage[]
+}
+
+// SmartOrderMessage - Track all WhatsApp messages for an order
+model SmartOrderMessage {
+  id              String   @id @default(uuid())
+  smartOrderId    String
+  from            String   // Who sent it (customer/seller)
+  to              String
+  messageText     String?
+  flowData        Json?    // Flow payload if applicable
+  messageType     MessageType @default(TEXT)
+  createdAt       DateTime @default(now)
+
+  smartOrder      SmartOrder @relation(fields: [smartOrderId], references: [id], onDelete: Cascade)
+}
+
+// FlowSession - Track active WhatsApp Flow sessions
+model FlowSession {
+  id              String   @id @default(uuid())
+  sessionId       String   @unique // WhatsApp Flow session ID
+  smartOrderId    String
+  flowType        FlowType
+  status          SessionStatus @default(ACTIVE)
+  data            Json?    // Session-specific data
+  createdAt       DateTime @default(now())
+  completedAt     DateTime?
+
+  smartOrder      SmartOrder @relation(fields: [smartOrderId], references: [id], onDelete: Cascade)
+}
+
+// Enumerations
+enum OrderStatus {
+  PENDING          // Customer initiated, waiting for digitization
+  DIGITIZED        // AI parsed, waiting for customer review
+  REVIEWING        // Customer reviewing edited order
+  PRICING        // Seller providing pricing
+  CONFIRMED        // Customer confirmed, seller packing
+  PACKING          // Seller is packing
+  PACKED           // Order packed, waiting for pickup
+  COMPLETED        // Order completed
+  CANCELLED        // Order cancelled
+}
+
+enum MessageType {
+  TEXT
+  FLOW
+  INTERACTIVE
+  TEMPLATE
+}
+
+enum FlowType {
+  SUBMIT_ORDER     // Step 1: Customer submits order
+  REVIEW_ORDER     // Step 2: Customer reviews edited order
+  SELLER_PRICING   // Step 3: Seller provides pricing
+  CUSTOMER_CONFIRM // Step 4: Customer confirms order
+  PACKED_NOTIF     // Step 5: Packed notification
+}
+
+enum SessionStatus {
+  ACTIVE
+  COMPLETED
+  EXPIRED
+  CANCELLED
+}

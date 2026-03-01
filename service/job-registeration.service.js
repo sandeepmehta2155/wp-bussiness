@@ -1,5 +1,6 @@
 const { getPgBoss } = require("../pg-boss.js");
 const CONSTANT = require("../utils/constants.js");
+const { registerSmartOrderJobs } = require("./smart-order-jobs.js");
 
 
 const registerJob = async () => {
@@ -15,6 +16,9 @@ const registerJob = async () => {
     { subdomain: "test" },
     { tz: CONSTANT.CST_TIMEZONE },
   );
+
+  // Register SmartOrder background jobs
+  await registerSmartOrderJobs();
 };
 
 module.exports = {

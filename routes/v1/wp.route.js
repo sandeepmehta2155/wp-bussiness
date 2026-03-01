@@ -12,7 +12,7 @@ const {
 const { embeddings } = require("../../service/emedding-docs.js");
 const { chatWithRules, ingestDocument } = require("../../service/rag-ollama-embedding.js");
 const { pipeline } = require("@xenova/transformers");
-
+const smartOrderService = require("../../service/smart-order.service.js");
 
 let embedder;
 
@@ -62,16 +62,27 @@ const WHATSAPP_TOKEN =
   "EAAKBsrR5KzEBOwVRk2iIgVwdvRvATaIR8DAxly1O7AnWhig5zJIjHNPdRyZANklsojfQCAOPkVNov3LR4gw2J9hcZAAQ7NRi6YJ1wRww7ohPpddvmleHvLZBrSIt9DqDsolufO0YjsHspnzhsiasZAsvDF2iJ7kNmTh2GGHFmRMvNsFwyQSPAVFUv5dJnjFLvgZDZD";
 const PHONE_NUMBER_ID = "629141943625066";
 
-function sendMessage(to, message) {
+/**
+ * Send a message via WhatsApp Business API
+ */
+function sendMessage(to, message, messageData = {}) {
+  const payload = {
+    messaging_product: "whatsapp",
+    to: to,
+    type: "text",
+    text: { body: message },
+    ...messageData
+  };
+
+  // If message is an object (for non-text messages), use it directly
+  if (typeof message !== 'string') {
+    Object.assign(payload, message);
+  }
+
   axios
     .post(
       `https://graph.facebook.com/v22.0/${PHONE_NUMBER_ID}/messages`,
-      {
-        messaging_product: "whatsapp",
-        to: to,
-        type: "text",
-        text: { body: message },
-      },
+      payload,
       {
         headers: {
           Authorization: `Bearer ${WHATSAPP_TOKEN}`,
@@ -90,6 +101,25 @@ function sendMessage(to, message) {
     });
 }
 
+/**
+ * Send a flow message via WhatsApp Business API
+ */
+function sendFlowMessage(to, flowId, data = {}) {
+  sendMessage(to, {
+    type: "flow",
+    flow: {
+      flow_id: flowId,
+      flow_action: "trigger",
+      flow_action_payload: {
+        data: data,
+      },
+    },
+  });
+}
+
+/**
+ * Handle text messages
+ */
 function handleMessage(text) {
   const parts = text.trim().split(" ");
   const command = parts[0].toLowerCase();
@@ -114,31 +144,137 @@ function handleMessage(text) {
   return "🤖 Sorry, I did not understand that.";
 }
 
-router.post("/webhook", ( _req, _res) => {
+/**
+ * Process flow submission data
+ */
+async function processFlowSubmission(from, flowData) {
+  const { flow_id, flow_request_id, data } = flowData;
+
+  console.log("Flow submission received:", { flow_id, flow_request_id, data });
+
+  // Try to find order by data
+  let orderId = data?.orderId || data?.smart_order_id;
+
+  if (!orderId) {
+    // Try to find active order by customer phone
+    const orders = await smartOrderService.getActiveOrdersByCustomer(from);
+    if (orders.length > 0) {
+      orderId = orders[0].id;
+    }
+  }
+
+  if (orderId) {
+    // Log the flow submission
+    await smartOrderService.logFlowMessage(orderId, from, 'system', flowData);
+
+    // Update order status if needed
+    const order = await smartOrderService.getSmartOrderById(orderId);
+    if (order) {
+      // Process based on flow type if available in data
+      if (data?.flowType) {
+        const statusMap = {
+          'SUBMIT_ORDER': 'DIGITIZED',
+          'REVIEW_ORDER': 'REVIEWING',
+          'SELLER_PRICING': 'PRICING',
+          'CUSTOMER_CONFIRM': 'CONFIRMED',
+          'PACKED_NOTIF': 'PACKED',
+        };
+        const newStatus = statusMap[data.flowType];
+        if (newStatus) {
+          await smartOrderService.updateSmartOrderStatus(orderId, newStatus, data);
+        }
+      }
+    }
+
+    return { processed: true, orderId };
+  }
+
+  return { processed: false };
+}
+
+// Flow configurations
+const FLOW_CONFIGS = {
+  SUBMIT_ORDER: {
+    flowId: process.env.FLOW_SUBMIT_ORDER_ID || "default_submit_flow_id",
+    name: "Submit Order",
+  },
+  REVIEW_ORDER: {
+    flowId: process.env.FLOW_REVIEW_ORDER_ID || "default_review_flow_id",
+    name: "Review Order",
+  },
+  SELLER_PRICING: {
+    flowId: process.env.FLOW_SELLER_PRICING_ID || "default_pricing_flow_id",
+    name: "Seller Pricing",
+  },
+  CUSTOMER_CONFIRM: {
+    flowId: process.env.FLOW_CUSTOMER_CONFIRM_ID || "default_confirm_flow_id",
+    name: "Customer Confirm",
+  },
+  PACKED_NOTIF: {
+    flowId: process.env.FLOW_PACKED_NOTIF_ID || "default_packed_flow_id",
+    name: "Packed Notification",
+  },
+};
+
+// Helper to start a flow for an order
+async function startOrderFlow(orderId, flowType) {
+  const config = FLOW_CONFIGS[flowType];
+  if (!config) return null;
+
+  const order = await smartOrderService.getSmartOrderById(orderId);
+  if (!order) return null;
+
+  // Create flow session
+  await smartOrderService.createFlowSession(
+    `flow-${orderId}-${flowType}-${Date.now()}`,
+    orderId,
+    flowType,
+    { flowType }
+  );
+
+  // Send flow message
+  sendFlowMessage(order.customer_phone, config.flowId, {
+    orderId: order.id,
+    flowType,
+  });
+
+  return { order, flowType };
+}
+
+// Start flow for new orders (pending)
+async function startPendingOrderFlows() {
+  const pendingOrders = await smartOrderService.getOrdersByStatus('PENDING');
+  for (const order of pendingOrders) {
+    await startOrderFlow(order.id, 'SUBMIT_ORDER');
+  }
+}
+
+router.post("/webhook", async (_req, _res) => {
   const body = _req.body;
-//   let body_param = _req.body;
 
-  if (
-    body.object &&
-    body.entry &&
-    body.entry?.[0].changes?.[0].value.messages?.[0]
-  ) {
-    const message = body.entry[0].changes[0].value.messages[0];
-    const text = message.text?.body;
-    const from = message.from;
-    console.log(body.entry[0], "some message rcvd");
-    
-    // let phon_no_id =
-    //   body_param.entry[0].changes[0].value.metadata.phone_number_id;
-    // let froms = body_param.entry[0].changes[0].value.messages[0].from;
-    // let msg_body = body_param.entry[0].changes[0].value.messages[0].text.body;
+  // Handle flow submissions
+  if (body.object === "instagram" || body.object === "whatsapp") {
+    if (body.entry?.[0]?.changes?.[0]?.value?.message_flows?.[0]) {
+      const flowUpdate = body.entry[0].changes[0].value.message_flows[0];
+      const from = flowUpdate.from;
 
-    // console.log("phone number " + phon_no_id);
-    // console.log("from " + from);
-    // console.log("boady param " + msg_body);
+      // Process flow submission
+      const result = await processFlowSubmission(from, flowUpdate);
+      console.log("Flow submission processed:", result);
+      _res.sendStatus(200);
+      return;
+    }
 
-    const response = handleMessage(text); // Your bot logic
-    sendMessage(from, response);
+    // Handle regular messages
+    if (body.entry?.[0].changes?.[0].value.messages?.[0]) {
+      const message = body.entry[0].changes[0].value.messages[0];
+      const text = message.text?.body;
+      const from = message.from;
+      console.log(body.entry[0], "some message rcvd");
+
+      const response = handleMessage(text);
+      sendMessage(from, response);
+    }
   }
 
   _res.sendStatus(200);
@@ -206,3 +342,5 @@ router.post('/chat-with-rules', async (req, res) => {
 
 
 module.exports = router;
+module.exports.sendMessage = sendMessage;
+module.exports.sendFlowMessage = sendFlowMessage;

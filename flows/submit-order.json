@@ -1,0 +1,45 @@
+{
+  "version": "3.0",
+  "data_api_version": "3.0",
+  "layout": {
+    "type": "single_column",
+    "children": [
+      {
+        "type": "text",
+        "text": "🛒 Submit Your Order",
+        "horizontal_alignment": "center",
+        "font_style": {
+          "bold": true,
+          "size": "large"
+        }
+      },
+      {
+        "type": "text",
+        "text": "Type the items you want to order below. Examples:\n• 1kg sugar\n• 2 packets of rice\n• 500g spices mix",
+        "horizontal_alignment": "center",
+        "font_style": {
+          "size": "medium"
+        }
+      },
+      {
+        "type": "form",
+        "children": [
+          {
+            "type": "text_input",
+            "key": "order_items",
+            "label": "What do you want to order?",
+            "placeholder": "e.g., 1kg sugar, 2 packets of rice",
+            "required": true,
+            "error_label": "Please enter the items you want to order",
+            "autocorrect": true
+          }
+        ],
+        "submit_label": "Submit Order",
+        "submit_action": "submit"
+      }
+    ]
+  },
+  "submit": {
+    "action": "submit_order"
+  }
+}

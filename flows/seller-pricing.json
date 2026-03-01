@@ -1,0 +1,77 @@
+{
+  "version": "3.0",
+  "data_api_version": "3.0",
+  "layout": {
+    "type": "single_column",
+    "children": [
+      {
+        "type": "text",
+        "text": "💰 Seller Pricing",
+        "horizontal_alignment": "center",
+        "font_style": {
+          "bold": true,
+          "size": "large"
+        }
+      },
+      {
+        "type": "text",
+        "text": "Please review the customer order and provide pricing. Mark items as available or unavailable:",
+        "horizontal_alignment": "center"
+      },
+      {
+        "type": "form",
+        "children": [
+          {
+            "type": "repeater",
+            "key": "seller_items",
+            "label": "Order Items",
+            "min_items": 1,
+            "children": [
+              {
+                "type": "text",
+                "text": "{item.name}",
+                "font_style": {
+                  "bold": true
+                }
+              },
+              {
+                "type": "text_input",
+                "key": "quantity",
+                "label": "Quantity",
+                "value": "{item.quantity}",
+                "readonly": true
+              },
+              {
+                "type": "text_input",
+                "key": "price",
+                "label": "Price per unit (₹)",
+                "placeholder": "0.00",
+                "input_type": "decimal",
+                "required": true
+              },
+              {
+                "type": "toggle",
+                "key": "is_available",
+                "label": "Available",
+                "true_label": "In Stock",
+                "false_label": "Out of Stock",
+                "default_value": true
+              },
+              {
+                "type": "text_input",
+                "key": "substitution",
+                "label": "Suggested substitution (if unavailable)",
+                "placeholder": "e.g., Regular sugar instead of crystal"
+              }
+            ]
+          }
+        ],
+        "submit_label": "Submit Pricing",
+        "submit_action": "submit_pricing"
+      }
+    ]
+  },
+  "submit": {
+    "action": "submit_pricing"
+  }
+}

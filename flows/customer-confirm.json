@@ -1,0 +1,71 @@
+{
+  "version": "3.0",
+  "data_api_version": "3.0",
+  "layout": {
+    "type": "single_column",
+    "children": [
+      {
+        "type": "text",
+        "text": "✅ Order Confirmation",
+        "horizontal_alignment": "center",
+        "font_style": {
+          "bold": true,
+          "size": "large"
+        }
+      },
+      {
+        "type": "text",
+        "text": "Here's your order summary with seller pricing:",
+        "horizontal_alignment": "center"
+      },
+      {
+        "type": "form",
+        "children": [
+          {
+            "type": "repeater",
+            "key": "final_items",
+            "label": "Order Items",
+            "min_items": 1,
+            "children": [
+              {
+                "type": "text",
+                "text": "• {item.name} - {item.quantity} @ ₹{item.price}/unit",
+                "font_style": {
+                  "size": "medium"
+                }
+              },
+              {
+                "type": "text",
+                "text": "{item.available_status}",
+                "font_style": {
+                  "color": "{item.status_color}"
+                }
+              }
+            ]
+          },
+          {
+            "type": "text",
+            "text": "Total: ₹{total_amount}",
+            "font_style": {
+              "bold": true,
+              "size": "large"
+            }
+          },
+          {
+            "type": "text",
+            "text": "By confirming, you agree to purchase the items listed above.",
+            "horizontal_alignment": "center",
+            "font_style": {
+              "size": "small"
+            }
+          }
+        ],
+        "submit_label": "Confirm Order",
+        "submit_action": "confirm_final_order"
+      }
+    ]
+  },
+  "submit": {
+    "action": "confirm_final_order"
+  }
+}
