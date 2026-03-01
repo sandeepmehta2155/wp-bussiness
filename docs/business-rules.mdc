@@ -1,225 +1,84 @@
----
-title: Business Rules & Module Documentation
-description: Reference guide for business rules across all modules and user roles
----
+# **Product Requirements Document (PRD)**
 
-# Business Rules Documentation
+**Product Name:** SmartOrder (WhatsApp Custom Ordering System)  
+**Document Version:** 1.0  
+**Target Audience:** Local Shopkeepers (Sellers) and their End Customers (Buyers)
 
-## Overview
+##
 
-Comprehensive business rules for the Stratik Backend application are documented in `/docs/business-rules/`. This documentation is organized by module and user role to facilitate efficient code generation and implementation.
+## **1\. Executive Summary**
 
-## Six Core Modules
+SmartOrder is a WhatsApp-based conversational commerce platform designed to bridge the gap between local shopkeepers (Kirana stores, pharmacies, general stores) and their customers. By leveraging the WhatsApp Business API and AI parsing, customers can simply send their unstructured shopping lists (via text, voice, or images). The system structures this data, allows interactive review, and provides the shopkeeper with a streamlined WhatsApp-based management interface to fulfill orders, manage out-of-stock items, and coordinate pickups seamlessly—without ever leaving their chat app.
 
-1. **Resource Module** (`docs/business-rules/resource/`)
-   - Resource creation, management, and lifecycle
-   - Event-specific resources
-   - Category-based resource organization
-   - Team Lead/Secondary Team Lead resource management
+##
 
-2. **Callout Module** (`docs/business-rules/callout/`)
-   - Callout creation and management
-   - Response tracking
-   - Notification handling (SMS, Email, Push)
-   - Team-based callout scoping
+## **2\. Target Personas**
 
-3. **Destination Matrix Module** (`docs/business-rules/destination-matrix/`)
-   - ETA calculations from departing locations to destination
-   - Available resources display sorted by ETA
-   - Utility dashboard sharing via secure tokens
-   - Map visualization with routes and regions
-   - Export reports (CSV, Excel, PDF)
+- **The Buyer (End Customer):** Wants the convenience of ordering groceries/items without browsing complex apps. Prefers sending a quick voice note or a photo of a handwritten list to their trusted local shop.
+- **The Seller (Shopkeeper):** Wants to organize incoming WhatsApp orders, which are currently chaotic and require constant back-and-forth messaging. Needs to manage incoming orders, pack items, and handle out-of-stock scenarios seamlessly from within their own WhatsApp account.
 
-4. **Roster Module** (`docs/business-rules/roster/`)
-   - Roster creation and scheduling
-   - Resource assignment to rosters
-   - Running availability management
-   - Roster import/export
-   - Roster versioning and history
+##
 
-5. **Form Generator Module** (`docs/business-rules/form-generator/`)
-   - Dynamic form template creation
-   - Form field configuration
-   - Form submission handling
-   - Conditional fields and validation
-   - Form workflows
+## **3\. User Journeys**
 
-6. **User Access Management Module** (`docs/business-rules/user-access-management/`)
-   - User authentication and authorization
-   - Role-based access control (RBAC)
-   - Permission management (module-action based)
-   - Category-based user scoping
-   - Multi-tenant user management
+### **3.1 Buyer Journey (Order Placement & Confirmation)**
 
-## Four User Role Types
+1. **Initiation:** Buyer opens the shop's WhatsApp Business chat and sends their list via a text message, an image of a handwritten note, or a voice note.
+2. **AI Parsing:** The SmartOrder Bot receives the message, processes it via AI, and extracts line items (Name, Quantity, Unit/Type, Estimated Price).
+3. **Review & Edit:** The Bot replies with an interactive Order Summary.
+   - _Discrepancy Correction:_ If the AI misinterpreted an item, the Buyer taps the item. An input box appears, allowing manual correction of the name, quantity, or price.
+4. **Confirmation:** Once satisfied, the Buyer confirms the order. The order is securely transmitted to the Seller.
 
-Each module's rules are documented separately for each role:
+###
 
-### 1. Admin (`*/admin/rules.md`)
-- Full system access
-- Configuration and management capabilities
-- Cross-category access
-- System-wide operations
+### **3.2 Seller Journey (Fulfillment & Exceptions)**
 
-### 2. Team Lead (`*/team-lead/rules.md`)
-- Category-scoped access
-- Team management capabilities
-- Can designate Secondary Team Lead
-- Resource and roster management within category
+1. **Order Receipt:** Seller receives a structured order notification from the SmartOrder Admin Bot directly in their WhatsApp account.
+2. **Packing Process:** Seller begins packing using interactive WhatsApp messages. As items are packed, they tap "Found & Packed" on the WhatsApp list/buttons.
+3. **Exception Handling (Out of Stock):** \* If an item is missing, the Seller taps "Not Found" in the WhatsApp interactive message.
+   - The Bot prompts the Seller to reply with a suggested replacement (Name and Price) for the missing item.
+4. **Buyer Resolution:** \* Once packing is paused for review, the Buyer receives a WhatsApp notification detailing the missing items and suggested replacements.
+   - Buyer selects "Accept" or "Skip" for each replacement directly within their WhatsApp chat.
+5. **Finalization:** Seller receives a WhatsApp alert with the Buyer's final decision. Seller finalizes the packed bags.
+6. **Pickup Notification:** Seller taps a "Ready for Pickup" quick reply. Buyer receives a final receipt on WhatsApp indicating they can come to the store at their convenience.
 
-### 3. Secondary Team Lead (`*/secondary-team-lead/rules.md`)
-- Delegated access from Team Lead
-- Category-scoped (same as Team Lead)
-- Limited write permissions
-- Primarily monitoring and viewing role
+##
 
-### 4. Access-Based User (`*/access-based-user/rules.md`)
-- Module-action permission based access
-- Most restrictive role
-- Self-service profile management only
-- Requires explicit permission grants for each operation
+## **4\. Functional Requirements**
 
-## How to Use This Documentation
+### **4.1 Buyer Interface (WhatsApp Business API / Flows)**
 
-### For Code Generation
-When implementing new features or endpoints:
+- **Omnichannel Input Handling:** System must accept standard text, audio files (voice notes), and image files.
+- **AI Entity Extraction:** Backend must parse unstructured input into a strict JSON schema: \[ { "id", "name", "qty", "type", "estimated_price" } \].
+- **Interactive Review UI:** Utilize WhatsApp Flows or Web-views to present the parsed list to the user.
+  - **Inline Editing:** Must support tapping a specific item to open input fields for Name, Qty, Type, and Price.
+- **Action Buttons:** "Confirm Order", "Edit Item", "Accept Replacement", "Skip Replacement".
+- **Real-time Notifications:** Automated text updates triggered by Seller actions (e.g., "Packing Started", "Replacements Suggested", "Ready for Pickup").
 
-1. **Identify the module** (Resource, Callout, Roster, Form Generator, User Access Management)
-2. **Identify the user role** (Admin, Team Lead, Secondary Team Lead, Access-Based User)
-3. **Reference** `docs/business-rules/{module}/{role}/rules.md`
-4. **Follow the documented rules** for:
-   - Access control & permissions
-   - Core business logic & constraints
-   - Key workflows & processes
-   - Data relationships & dependencies
-   - Validation rules
-   - Special cases & edge cases
+###
 
-### For New Task Implementation
+### **4.2 Seller Interface (WhatsApp Admin Interface / Flows)**
 
-#### Step 1: Consult Business Rules
-```
-Read: docs/business-rules/{relevant-module}/{relevant-role}/rules.md
-```
+- **Order Management:** Utilizing WhatsApp Business Labels (if applicable) or thread management to track order states, and receiving new orders as structured WhatsApp messages.
+- **Digital Packing Slip:** An interactive WhatsApp message (WhatsApp Lists/Flows) serving as a checklist for the active order.
+  - Button: Found & Packed
+  - Button: Not Found \-\> Triggers a conversational prompt to enter Replacement Name and Replacement Price.
+- **State Management:** Orders must have explicit states managed by the backend: Idle \-\> Parsing \-\> Reviewing \-\> Submitted \-\> Packing \-\> Awaiting Replacement Approval \-\> Ready for Pickup \-\> Completed.
+- **Notification Triggers:** Interactive button taps by the Seller (like finalizing replacements or marking ready for pickup) must instantly trigger backend logic to send the respective WhatsApp messages to the Buyer.
+- **Final Receipt Generator:** System must calculate the final total based on original items found \+ accepted replacements (ignoring skipped items).
 
-#### Step 2: Apply Standard Patterns
-Follow the existing workspace rules:
-- Email handling: Use `cleanEmail()`
-- User deletion: Use `userService.deleteUser()` or `userService.removeUser()`
-- Multi-tenant: Get prisma via `tenant.get(subdomain)`
-- Permissions: Use `verifyAccess([{ module, action }])`
-- Controllers: Destructure requests, delegate to services
-- Services: Accept object params with `{ prisma, ... }`
+##
 
-#### Step 3: Implement with Role Context
-Ensure the implementation respects:
-- What the user role CAN do
-- What the user role CANNOT do
-- Scope limitations (category-based, permission-based)
-- Required validations
-- Special edge cases
+## **5\. Non-Functional Requirements**
 
-### For Permission Checks
+- **Latency:** AI parsing (from receipt of voice note/image to replying with structured data) should ideally occur within 3-5 seconds to maintain conversational flow.
+- **Accuracy:** The AI entity extraction must maintain a high confidence score, especially for local language/colloquial terms used for groceries.
+- **Accessibility:** The WhatsApp interactive messages must be easily readable. The Seller's WhatsApp interactions must be concise, utilizing quick replies and lists to minimize typing while they move around the store.
+- **Data Privacy:** Customer phone numbers and order history must be securely managed by the bot infrastructure, ensuring clear separation of different customers' data.
 
-Always use the module-action permission model:
+##
 
-```typescript
-import { Modules, Actions } from "../types/enums";
-import { verifyAccess } from "../middlewares/validateAccess";
+## **6\. Future Scope (Out of Scope for V1)**
 
-router.post(
-  "/endpoint",
-  auth(),
-  verifyAccess([{ module: Modules.RESOURCE, action: Actions.CREATE }]),
-  controller.handler
-);
-```
-
-**Reference:** See `docs/business-rules/user-access-management/` for detailed permission rules per role.
-
-### For Category-Based Scoping
-
-Team Leads and Secondary Team Leads operate within category boundaries:
-
-- **Queries**: Auto-filter by assigned category
-- **Mutations**: Validate category ownership
-- **Access checks**: Use `validateCategoryAccess` middleware where applicable
-
-**Reference:** See module-specific Team Lead rules for category scoping details.
-
-## Documentation Structure
-
-```
-docs/business-rules/
-├── README.md                          # Overview and guidelines
-├── resource/
-│   ├── README.md                      # Resource module overview
-│   ├── admin/rules.md                 # Admin-specific rules
-│   ├── team-lead/rules.md             # Team Lead rules
-│   ├── secondary-team-lead/rules.md   # STL rules
-│   └── access-based-user/rules.md     # Access-based user rules
-├── callout/
-│   ├── README.md
-│   ├── admin/rules.md
-│   ├── team-lead/rules.md
-│   ├── secondary-team-lead/rules.md
-│   └── access-based-user/rules.md
-├── destination-matrix/
-│   ├── README.md
-│   ├── admin/rules.md
-│   ├── team-lead/rules.md
-│   ├── secondary-team-lead/rules.md
-│   └── access-based-user/rules.md
-├── roster/
-│   ├── README.md
-│   ├── admin/rules.md
-│   ├── team-lead/rules.md
-│   ├── secondary-team-lead/rules.md
-│   └── access-based-user/rules.md
-├── form-generator/
-│   ├── README.md
-│   ├── admin/rules.md
-│   ├── team-lead/rules.md
-│   ├── secondary-team-lead/rules.md
-│   └── access-based-user/rules.md
-└── user-access-management/
-    ├── README.md
-    ├── admin/rules.md
-    ├── team-lead/rules.md
-    ├── secondary-team-lead/rules.md
-    └── access-based-user/rules.md
-```
-
-## Quick Reference Matrix
-
-| Module | Admin Access | Team Lead Access | STL Access | Access-Based User |
-|--------|-------------|------------------|------------|-------------------|
-| Resource | Full CRUD, all categories | CRUD within category | View within category | Permission-based |
-| Callout | Full CRUD, all categories | CRUD within category | View within category | Permission-based |
-| Destination Matrix | View all, share to utilities | View team/category only | View team/category only | Permission-based |
-| Roster | Full CRUD, all categories | CRUD within category | View within category | Permission-based |
-| Form Generator | Full CRUD, all forms | CRUD within category | View within category | Submit & view own |
-| User Access Mgmt | Full user management | View team users | View team users | View/edit own profile |
-
-## Integration with Existing Rules
-
-This business rules documentation **complements** the existing workspace rules:
-
-- **Existing rules** define **how** to implement (technical patterns)
-- **Business rules** define **what** to implement (business logic and constraints)
-
-Both must be followed for correct implementation.
-
-## Maintenance
-
-- **When adding new features**: Update relevant module/role documentation
-- **When changing business logic**: Update rules before implementing
-- **During code reviews**: Verify implementation matches documented rules
-- **For onboarding**: Start with `docs/business-rules/README.md`
-
-## Notes
-
-- All rule files are templates ready to be filled with specific business logic
-- Rules should be kept up-to-date with actual implementation
-- Rules are version-controlled alongside code
-- Rules serve as single source of truth for business requirements
+- **Online Payments:** Sending UPI payment links or payment gateway integrations via WhatsApp upon order completion.
+- **Home Delivery:** Assigning delivery partners or managing delivery addresses. (V1 is strictly self-pickup).

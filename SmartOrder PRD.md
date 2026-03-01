@@ -1,0 +1,84 @@
+# **Product Requirements Document (PRD)**
+
+**Product Name:** SmartOrder (WhatsApp Custom Ordering System)  
+**Document Version:** 1.0  
+**Target Audience:** Local Shopkeepers (Sellers) and their End Customers (Buyers)
+
+## 
+
+## **1\. Executive Summary**
+
+SmartOrder is a WhatsApp-based conversational commerce platform designed to bridge the gap between local shopkeepers (Kirana stores, pharmacies, general stores) and their customers. By leveraging the WhatsApp Business API and AI parsing, customers can simply send their unstructured shopping lists (via text, voice, or images). The system structures this data, allows interactive review, and provides the shopkeeper with a streamlined WhatsApp-based management interface to fulfill orders, manage out-of-stock items, and coordinate pickups seamlessly—without ever leaving their chat app.
+
+## 
+
+## **2\. Target Personas**
+
+* **The Buyer (End Customer):** Wants the convenience of ordering groceries/items without browsing complex apps. Prefers sending a quick voice note or a photo of a handwritten list to their trusted local shop.  
+* **The Seller (Shopkeeper):** Wants to organize incoming WhatsApp orders, which are currently chaotic and require constant back-and-forth messaging. Needs to manage incoming orders, pack items, and handle out-of-stock scenarios seamlessly from within their own WhatsApp account.
+
+## 
+
+## **3\. User Journeys**
+
+### **3.1 Buyer Journey (Order Placement & Confirmation)**
+
+1. **Initiation:** Buyer opens the shop's WhatsApp Business chat and sends their list via a text message, an image of a handwritten note, or a voice note.  
+2. **AI Parsing:** The SmartOrder Bot receives the message, processes it via AI, and extracts line items (Name, Quantity, Unit/Type, Estimated Price).  
+3. **Review & Edit:** The Bot replies with an interactive Order Summary.  
+   * *Discrepancy Correction:* If the AI misinterpreted an item, the Buyer taps the item. An input box appears, allowing manual correction of the name, quantity, or price.  
+4. **Confirmation:** Once satisfied, the Buyer confirms the order. The order is securely transmitted to the Seller.
+
+### 
+
+### **3.2 Seller Journey (Fulfillment & Exceptions)**
+
+1. **Order Receipt:** Seller receives a structured order notification from the SmartOrder Admin Bot directly in their WhatsApp account.  
+2. **Packing Process:** Seller begins packing using interactive WhatsApp messages. As items are packed, they tap "Found & Packed" on the WhatsApp list/buttons.  
+3. **Exception Handling (Out of Stock):** \* If an item is missing, the Seller taps "Not Found" in the WhatsApp interactive message.  
+   * The Bot prompts the Seller to reply with a suggested replacement (Name and Price) for the missing item.  
+4. **Buyer Resolution:** \* Once packing is paused for review, the Buyer receives a WhatsApp notification detailing the missing items and suggested replacements.  
+   * Buyer selects "Accept" or "Skip" for each replacement directly within their WhatsApp chat.  
+5. **Finalization:** Seller receives a WhatsApp alert with the Buyer's final decision. Seller finalizes the packed bags.  
+6. **Pickup Notification:** Seller taps a "Ready for Pickup" quick reply. Buyer receives a final receipt on WhatsApp indicating they can come to the store at their convenience.
+
+## 
+
+## **4\. Functional Requirements**
+
+### **4.1 Buyer Interface (WhatsApp Business API / Flows)**
+
+* **Omnichannel Input Handling:** System must accept standard text, audio files (voice notes), and image files.  
+* **AI Entity Extraction:** Backend must parse unstructured input into a strict JSON schema: \[ { "id", "name", "qty", "type", "estimated\_price" } \].  
+* **Interactive Review UI:** Utilize WhatsApp Flows or Web-views to present the parsed list to the user.  
+  * **Inline Editing:** Must support tapping a specific item to open input fields for Name, Qty, Type, and Price.  
+* **Action Buttons:** "Confirm Order", "Edit Item", "Accept Replacement", "Skip Replacement".  
+* **Real-time Notifications:** Automated text updates triggered by Seller actions (e.g., "Packing Started", "Replacements Suggested", "Ready for Pickup").
+
+### 
+
+### **4.2 Seller Interface (WhatsApp Admin Interface / Flows)**
+
+* **Order Management:** Utilizing WhatsApp Business Labels (if applicable) or thread management to track order states, and receiving new orders as structured WhatsApp messages.  
+* **Digital Packing Slip:** An interactive WhatsApp message (WhatsApp Lists/Flows) serving as a checklist for the active order.  
+  * Button: Found & Packed  
+  * Button: Not Found \-\> Triggers a conversational prompt to enter Replacement Name and Replacement Price.  
+* **State Management:** Orders must have explicit states managed by the backend: Idle \-\> Parsing \-\> Reviewing \-\> Submitted \-\> Packing \-\> Awaiting Replacement Approval \-\> Ready for Pickup \-\> Completed.  
+* **Notification Triggers:** Interactive button taps by the Seller (like finalizing replacements or marking ready for pickup) must instantly trigger backend logic to send the respective WhatsApp messages to the Buyer.  
+* **Final Receipt Generator:** System must calculate the final total based on original items found \+ accepted replacements (ignoring skipped items).
+
+## 
+
+## **5\. Non-Functional Requirements**
+
+* **Latency:** AI parsing (from receipt of voice note/image to replying with structured data) should ideally occur within 3-5 seconds to maintain conversational flow.  
+* **Accuracy:** The AI entity extraction must maintain a high confidence score, especially for local language/colloquial terms used for groceries.  
+* **Accessibility:** The WhatsApp interactive messages must be easily readable. The Seller's WhatsApp interactions must be concise, utilizing quick replies and lists to minimize typing while they move around the store.  
+* **Data Privacy:** Customer phone numbers and order history must be securely managed by the bot infrastructure, ensuring clear separation of different customers' data.
+
+## 
+
+## **6\. Future Scope (Out of Scope for V1)**
+
+* **Online Payments:** Sending UPI payment links or payment gateway integrations via WhatsApp upon order completion.  
+* **Home Delivery:** Assigning delivery partners or managing delivery addresses. (V1 is strictly self-pickup).
